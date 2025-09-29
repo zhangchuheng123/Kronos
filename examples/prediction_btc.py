@@ -5,7 +5,7 @@ sys.path.append("../")
 from model import Kronos, KronosTokenizer, KronosPredictor
 
 
-def plot_prediction(kline_df, pred_df):
+def plot_prediction(kline_df, pred_df, filename=None):
     pred_df.index = kline_df.index[-pred_df.shape[0]:]
     sr_close = kline_df['close']
     sr_pred_close = pred_df['close']
@@ -35,6 +35,8 @@ def plot_prediction(kline_df, pred_df):
     ax2.grid(True)
 
     plt.tight_layout()
+    if filename:
+        plt.savefig(filename)
     plt.show()
 
 
@@ -83,8 +85,6 @@ for end_datetime in ["2024-07-10 00:00:00", "2024-07-15 00:00:00", "2024-07-20 0
         verbose=True
     )
 
-    import pdb; pdb.set_trace()
-
     # 5. Visualize Results
     print("Forecasted Data Head:")
     print(pred_df.head())
@@ -93,5 +93,6 @@ for end_datetime in ["2024-07-10 00:00:00", "2024-07-15 00:00:00", "2024-07-20 0
     kline_df = df.loc[:lookback+pred_len-1]
 
     # visualize
-    plot_prediction(kline_df, pred_df)
+    plot_filename = f"prediction_btc_until_{end_datetime.replace(' ', '_').replace(':', '-')}.png"
+    plot_prediction(kline_df, pred_df, plot_filename)
 
