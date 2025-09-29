@@ -48,37 +48,45 @@ predictor = KronosPredictor(model, tokenizer, device="cuda:1", max_context=512)
 # 3. Prepare Data
 # df = pd.read_csv("./data/XSHG_5min_600977.csv")
 df = pd.read_pickle("/mnt/chuheng_data/dataset_humanplay/test_btc_202506/binance_BTCUSDT_20250701_swap_day_min20_0.pkl")
+df['timestamps'] = pd.to_datetime(df['datetime'])
+df = df.rename(columns={
+    'open_price': 'open',
+    'high_price': 'high',
+    'low_price': 'low',
+    'close_price': 'close',
+})
 
 import pdb; pdb.set_trace()
 
-df['timestamps'] = pd.to_datetime(df['timestamps'])
+for end_datetime in ["2024-07-10 00:00:00", "2024-07-15 00:00:00", "2024-07-20 00:00:00"]:
+    df_test = df[df['datetime'] <= end_datetime].copy()
 
-lookback = 400
-pred_len = 120
+    lookback = 400
+    pred_len = 120
 
-x_df = df.loc[:lookback-1, ['open', 'high', 'low', 'close', 'volume', 'amount']]
-x_timestamp = df.loc[:lookback-1, 'timestamps']
-y_timestamp = df.loc[lookback:lookback+pred_len-1, 'timestamps']
+    x_df = df_test.loc[:lookback-1, ['open', 'high', 'low', 'close', 'volume', 'amount']]
+    x_timestamp = df_test.loc[:lookback-1, 'timestamps']
+    y_timestamp = df_test.loc[lookback:lookback+pred_len-1, 'timestamps']
 
-# 4. Make Prediction
-pred_df = predictor.predict(
-    df=x_df,
-    x_timestamp=x_timestamp,
-    y_timestamp=y_timestamp,
-    pred_len=pred_len,
-    T=1.0,
-    top_p=0.9,
-    sample_count=1,
-    verbose=True
-)
+    # 4. Make Prediction
+    pred_df = predictor.predict(
+        df=x_df,
+        x_timestamp=x_timestamp,
+        y_timestamp=y_timestamp,
+        pred_len=pred_len,
+        T=1.0,
+        top_p=0.9,
+        sample_count=1,
+        verbose=True
+    )
 
-# 5. Visualize Results
-print("Forecasted Data Head:")
-print(pred_df.head())
+    # 5. Visualize Results
+    print("Forecasted Data Head:")
+    print(pred_df.head())
 
-# Combine historical and forecasted data for plotting
-kline_df = df.loc[:lookback+pred_len-1]
+    # Combine historical and forecasted data for plotting
+    kline_df = df.loc[:lookback+pred_len-1]
 
-# visualize
-plot_prediction(kline_df, pred_df)
+    # visualize
+    plot_prediction(kline_df, pred_df)
 
