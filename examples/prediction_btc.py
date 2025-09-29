@@ -56,7 +56,10 @@ df = df.rename(columns={
     'close_price': 'close',
 })
 
-import pdb; pdb.set_trace()
+# TODO: check whether this kind of fill is appropriate
+price_columns = ['open', 'high', 'low', 'close']
+df[price_columns] = df[price_columns].ffill()
+df[['volume', 'amount']] = df[['volume', 'amount']].fillna(0)
 
 for end_datetime in ["2024-07-10 00:00:00", "2024-07-15 00:00:00", "2024-07-20 00:00:00"]:
     df_test = df[df['datetime'] <= end_datetime].copy()
@@ -79,6 +82,8 @@ for end_datetime in ["2024-07-10 00:00:00", "2024-07-15 00:00:00", "2024-07-20 0
         sample_count=1,
         verbose=True
     )
+
+    import pdb; pdb.set_trace()
 
     # 5. Visualize Results
     print("Forecasted Data Head:")
