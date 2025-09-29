@@ -47,7 +47,7 @@ predictor = KronosPredictor(model, tokenizer, device="cuda:1", max_context=512)
 
 # 3. Prepare Data
 # df = pd.read_csv("./data/XSHG_5min_600977.csv")
-df = pd.read_csv("/mnt/chuheng_data/dataset_humanplay/test_btc_202506/binance_BTCUSDT_20250701_swap_day_min20_0.pkl")
+df = pd.read_pickle("/mnt/chuheng_data/dataset_humanplay/test_btc_202506/binance_BTCUSDT_20250701_swap_day_min20_0.pkl")
 
 import pdb; pdb.set_trace()
 
